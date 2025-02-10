@@ -42,6 +42,7 @@ app.post('/send-otp', async (req, res) => {
         success: true,
         message: 'OTP sent successfully',
         phone: phone,
+        otp: otp,
       });
     } else {
       return res.status(500).json({
