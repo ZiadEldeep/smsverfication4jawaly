@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>التحقق من رقم الهاتف</title>
+</head>
+<body>
+  <div class="row">
+    <div id="phone-verification-step">
+      <h3 class="mb-4 text-center">التحقق من رقم الهاتف</h3>
+      <div class="card p-4">
+        <div id="phone-input-section">
+          <div class="mb-3">
+            <label for="verify_phone" class="form-label-light">رقم الهاتف</label>
+            <div class="input-group" dir="ltr">
+              <span class="input-group-text">+966</span>
+              <input type="tel" class="form-control form-control-light" id="verify_phone"
+                     placeholder="أدخل رقم هاتفك" required pattern="[0-9]{9}" maxlength="9"
+                     title="رقم الهاتف يجب أن يحتوي على 9 أرقام بعد المفتاح الدولي">
+            </div>
+          </div>
+          <button type="button" class="btn btn-primary w-100" id="send-otp-btn">إرسال رمز التحقق</button>
+        </div>
+
+        <div id="otp-input-section" style="display: none;">
+          <div class="mb-3">
+            <label for="otp_code" class="form-label-light">رمز التحقق</label>
+            <input type="text" class="form-control form-control-light" id="otp_code"
+                   maxlength="6" placeholder="أدخل رمز التحقق" required>
+          </div>
+          <button type="button" class="btn btn-primary w-100 mb-2" id="verify-otp-btn">تحقق من الرمز</button>
+          <button type="button" class="btn btn-secondary w-100" id="back-to-phone">تغيير رقم الهاتف</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('send-otp-btn').addEventListener('click', async () => {
+      const phoneInput = document.getElementById('verify_phone');
+      const phone = phoneInput.value;
+      if (!phone) {
+        alert('يرجى إدخال رقم الهاتف');
+        return;
+      }
+      try {
+        const res = await fetch('/send-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone })
+        });
+        const data = await res.json();
+        if (data.success) {
+          document.getElementById('phone-input-section').style.display = 'none';
+          document.getElementById('otp-input-section').style.display = 'block';
+          alert(data.message);
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('حدث خطأ أثناء إرسال OTP');
+      }
+    });
+
+    document.getElementById('verify-otp-btn').addEventListener('click', async () => {
+      const phone = document.getElementById('verify_phone').value;
+      const otp = document.getElementById('otp_code').value;
+      if (!otp) {
+        alert('يرجى إدخال رمز التحقق');
+        return;
+      }
+      try {
+        const res = await fetch('/verify-otp', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, otp })
+        });
+        const data = await res.json();
+        if (data.success) {
+          alert(data.message);
+        } else {
+          alert(data.message);
+        }
+      } catch (err) {
+        console.error(err);
+        alert('حدث خطأ أثناء التحقق من OTP');
+      }
+    });
+
+    document.getElementById('back-to-phone').addEventListener('click', () => {
+      document.getElementById('otp-input-section').style.display = 'none';
+      document.getElementById('phone-input-section').style.display = 'block';
+    });
+  </script>
+</body>
+</html>
