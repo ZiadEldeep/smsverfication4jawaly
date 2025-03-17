@@ -35,7 +35,7 @@ app.post('/send-otp', async (req, res) => {
   console.log(`Sending OTP to ${phone} with code ${otp}`);
 
   try {
-    const result = await sendSMS(phone, `كود التحقق لحسابك  هو: ${otp}`);
+    const result = await sendSMS(phone, `كود التحقق لحسابك هو: ${otp}`);
 
     if (result.code === 200) {
       return res.status(200).json({
